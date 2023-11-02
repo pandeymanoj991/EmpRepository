@@ -11,7 +11,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
+import com.mk.dto.DepartmentDTO;
 import com.mk.dto.EmployeeDTO;
 import com.mk.entity.Employee;
 import com.mk.exception.ResourceNotFoundException;
@@ -25,17 +27,26 @@ public class EmployeeServiceImpl implements EmployeeService {
 	
 	@Autowired
 	private ModelMapper mapper;
+	
+	@Autowired
+	RestTemplate restTemplate;
 
 	@Override
 	public EmployeeDTO saveEmployee(EmployeeDTO employeeDTO) {
+		
+		String url = "http://localhost:8888/api/department/1";
+		
+		DepartmentDTO  dto = restTemplate.getForObject(url, DepartmentDTO.class, employeeDTO.getId());
+		
+		System.out.println("from Department:  "+dto.getDepartmentCode());
 
-		// Employee savedemployee =
-		// employeeRepository.save(EmployeeMapper.dtoToEntity(employeeDTO));
 
+	//===========================================================	
 		Employee savedemployee = mapper.map(employeeDTO, Employee.class);
 		
 		Employee employeeEntity = employeeRepository.save(savedemployee);
-
+		
+		
 		EmployeeDTO employeeDTORetuned = mapper.map(employeeEntity, EmployeeDTO.class);
 
 		return employeeDTORetuned;
@@ -115,6 +126,5 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 		return empDTOList;
 	}
-
 
 }
